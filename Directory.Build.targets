@@ -1,0 +1,57 @@
+<Project>
+  <PropertyGroup>
+    <RestoreAdditionalProjectSources>
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.windows10ce.com/nuget/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <!-- Modding dependencies -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- NuGet fallback stripped game references -->
+  <ItemGroup Condition="!Exists('$(ManagedDir)')">
+    <PackageReference Include="UnityEngine.Modules" Version="6000.0.36" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Local game references -->
+  <ItemGroup Condition="Exists('$(ManagedDir)')">
+    <LocalReferences
+      Include="$(ManagedDir)*.dll"
+      Exclude="$(ManagedDir)Mono*.dll;$(ManagedDir)netstandard.dll;$(ManagedDir)System*.dll;$(ManagedDir)mscorlib.dll" />
+    <Reference Include="@(LocalReferences)" Private="false" />
+    <!-- <Reference Include="$(ManagedDir)Assembly-CSharp.dll" Private="false" Publicize="true" /> -->
+  </ItemGroup>
+
+  <!-- Packages the project for use by Thunderstore -->
+  <Target Name="PackageTS" AfterTargets="Build" Condition="'$(PublishTS)' != 'true' And '$(ThunderstorePackable)' != 'false'">
+    <Error Text="PublishTS may not call PackageTS" Condition="'$(PublishTS)' == 'true'" />
+    <PropertyGroup>
+      <ThunderstoreCLIEnvironment Condition="'$(BuildingInsideVisualStudio)' == 'true'">NO_COLOR=1</ThunderstoreCLIEnvironment>
+      <ThunderstoreArchiveDir>$(SolutionRoot)artifacts/thunderstore/$(AssemblyTitle)/</ThunderstoreArchiveDir>
+      <ThunderstoreConfigPath Condition="'$(Configuration)' == 'Debug'">thunderstore.debug.toml</ThunderstoreConfigPath>
+      <ThunderstoreConfigPath Condition="'$(Configuration)' == 'Release'">thunderstore.toml</ThunderstoreConfigPath>
+      <ThunderstorePackageDir Condition="'$(Configuration)' == 'Debug'">$(ThunderstoreArchiveDir)debug/</ThunderstorePackageDir>
+      <ThunderstorePackageDir Condition="'$(Configuration)' == 'Release'">$(ThunderstoreArchiveDir)release/</ThunderstorePackageDir>
+      <ThunderstorePackagePath>$(ThunderstorePackageDir)$(Company)-$(AssemblyTitle)-$(Version).zip</ThunderstorePackagePath>
+    </PropertyGroup>
+    <Exec Command="dotnet tool restore" EnvironmentVariables="$(ThunderstoreCLIEnvironment)" StandardOutputImportance="low" />
+    <Exec Command="dotnet tcli build --config-path $(ThunderstoreConfigPath) --package-version $(Version)" EnvironmentVariables="$(ThunderstoreCLIEnvironment)" />
+  </Target>
+
+  <!-- Publish Package by calling `dotnet build -c Release -target:PublishTS -v d` -->
+  <Target Name="PublishTS" Condition="'$(ThunderstorePackable)' != 'false'">
+    <Error Text="PublishTS must be called with Release configuration." Condition="'$(Configuration)' != 'Release'" />
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Build" Properties="PublishTS=true;Configuration=$(Configuration)" />
+    <Exec Command="dotnet tool restore" StandardOutputImportance="low" />
+    <PropertyGroup>
+      <TCLIAuthToken Condition="'$(TCLIAuthToken)' == ''">$(TCLI_AUTH_TOKEN)</TCLIAuthToken>
+    </PropertyGroup>
+    <Exec Command="dotnet tcli publish --package-version $(Version)" EnvironmentVariables="TCLI_AUTH_TOKEN=$(TCLIAuthToken)" />
+  </Target>
+</Project>

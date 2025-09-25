@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <!-- If BepInEx is NOT manually installed, set this to an existing mod profile. -->
+    <!-- <PeakModProfile></PeakModProfile> -->
+    <!-- Set if you use a custom steam game install directory. -->
+    <!-- <PathBeforeSteam></PathBeforeSteam> -->
+    <!-- Set if your BepInEx/plugins/ directory isn't in the game files. -->
+    <!-- <PeakPluginsDir>$(UserAppDataRoaming)r2modmanPlus-local/PEAK/profiles/$(PeakModProfile)/BepInEx/plugins/</PeakPluginsDir> -->
+  </PropertyGroup>
+
+  <Target Name="DeployBuild" AfterTargets="PackageTS" Condition="'$(PublishTS)' != 'true' And '$(ThunderstorePackable)' != 'false'">
+    <Message Text="Deploy $(Configuration) Build -> $(PeakPluginsDir)$(Company)-$(AssemblyTitle)" Importance="High" />
+    <Error Text="Plugins directory '$([MSBuild]::NormalizeDirectory($(PeakPluginsDir)))' doesn't exist!" Condition="!Exists('$(PeakPluginsDir)')" />
+    <PropertyGroup>
+      <OutputDir>$(Company)-$(AssemblyTitle)</OutputDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(PeakPluginsDir)$(OutputDir)" />
+    <Exec Command="tar -xf $(ThunderstorePackagePath) --directory $(PeakPluginsDir)$(OutputDir)" />
+  </Target>
+</Project>
