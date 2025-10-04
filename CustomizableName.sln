@@ -16,17 +16,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B14
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\thunderstore-publish.yml = .github\workflows\thunderstore-publish.yml
+		.github\workflows\thunderstore-build.yml = .github\workflows\thunderstore-build.yml
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		Config.Build.user.props = Config.Build.user.props
 		Config.Build.user.props.template = Config.Build.user.props.template
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		.github\workflows\thunderstore.yml = .github\workflows\thunderstore.yml
 	EndProjectSection
 EndProject
 Global

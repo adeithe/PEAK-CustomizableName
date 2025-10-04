@@ -1,0 +1,42 @@
+name: Thunderstore
+on:
+  release:
+      types: released
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  MSBUILDTERMINALLOGGER: false
+  DOTNET_VERSION: 9.0.x
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    if: ${{ github.event_name == 'release' && github.action == 'released' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          filter: tree:0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Login to GitHub Packages
+        run: dotnet nuget add source --username ${{ github.actor }} --password ${{ github.token }} --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --store-password-in-clear-text
+      - id: build
+        name: Build and publish
+        run: |
+          dotnet build -c Release -target:PublishTS
+          FILE=$(find ${{ github.workspace }}/artifacts/thunderstore -type f -name "*.zip" | head -n 1)
+          [ -n "$FILE" ] || { echo "Artifact not found!"; exit 1; }
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.build.outputs.file }}
