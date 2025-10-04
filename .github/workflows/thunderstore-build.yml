@@ -15,7 +15,6 @@ jobs:
     permissions:
       contents: read
       packages: read
-    if: ${{ github.event_name == 'push' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
