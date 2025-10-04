@@ -4,7 +4,7 @@ Allows you to customize what name other scouts see. Updates for everyone, even i
 
 ## Features
 - Name updates for everyone, even if they don't have the mod installed.
-- Customizable in main menu settings. (Main Menu > Settings > General)
+- Customizable in main menu settings. (Main Menu > Settings > Accessibility)
 - Full localization support.
 
 ## Installation

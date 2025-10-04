@@ -8,7 +8,7 @@
     <!-- <PeakPluginsDir>$(UserAppDataRoaming)r2modmanPlus-local/PEAK/profiles/$(PeakModProfile)/BepInEx/plugins/</PeakPluginsDir> -->
   </PropertyGroup>
 
-  <Target Name="DeployBuild" AfterTargets="PackageTS" Condition="'$(PublishTS)' != 'true' And '$(ThunderstorePackable)' != 'false'">
+  <Target Name="DeployBuild" AfterTargets="PackageTS" Condition="'$(PublishTS)' != 'true' And '$(ThunderstorePackable)' != 'false' And '$(CI)' != 'true'">
     <Message Text="Deploy $(Configuration) Build -> $(PeakPluginsDir)$(Company)-$(AssemblyTitle)" Importance="High" />
     <Error Text="Plugins directory '$([MSBuild]::NormalizeDirectory($(PeakPluginsDir)))' doesn't exist!" Condition="!Exists('$(PeakPluginsDir)')" />
     <PropertyGroup>

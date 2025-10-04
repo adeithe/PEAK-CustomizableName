@@ -9,10 +9,41 @@ using Zorro.Settings.UI;
 
 namespace CustomizableName.Components {
 	internal class PreferredNameSetting: StringSetting, IExposedSetting, IConditionalSetting {
-		private readonly GameObject uiCell;
+		private static bool initialized = false;
 
-		private PreferredNameSetting() : base() {
-			uiCell = Object.Instantiate(SingletonAsset<InputCellMapper>.Instance.FloatSettingCell);
+		private PreferredNameSetting() : base() {}
+
+		public override void Load(ISettingsSaveLoad loader) {
+			Value = Plugin.Config.PreferredName.Value ?? "";
+		}
+
+		public override void Save(ISettingsSaveLoad saver) {
+			Plugin.Config.DisplayName = Value.Trim();
+		}
+
+		public override void ApplyValue() { }
+
+		protected override string GetDefaultValue() {
+			return "";
+		}
+
+		public string GetDisplayName() {
+			return "PREFERREDNAMESETTING";
+		}
+
+		public string GetCategory() {
+			return "Accessibility";
+		}
+
+		public bool ShouldShow() {
+			return !PhotonNetwork.InRoom;
+		}
+
+		public override GameObject GetSettingUICell() {
+			GameObject existing = GameObject.Find("PreferredNameInputCell");
+			if(existing != null) return existing;
+
+			GameObject uiCell = Object.Instantiate(SingletonAsset<InputCellMapper>.Instance.FloatSettingCell);
 			uiCell.name = "PreferredNameInputCell";
 
 			FloatSettingUI old = uiCell.GetComponent<FloatSettingUI>();
@@ -22,6 +53,9 @@ namespace CustomizableName.Components {
 			Object.DestroyImmediate(old.slider.gameObject);
 			Object.DestroyImmediate(old);
 
+			ui.disable = PhotonNetwork.InRoom;
+			ui.inputField.readOnly = ui.disable;
+			ui.inputField.interactable = !ui.disable;
 			ui.inputField.characterValidation = TMP_InputField.CharacterValidation.None;
 			ui.inputField.characterLimit = 24;
 			ui.inputField.contentType = TMP_InputField.ContentType.Standard;
@@ -39,40 +73,11 @@ namespace CustomizableName.Components {
 				label.fontSize = label.fontSizeMin = label.fontSizeMax = 24f;
 				label.alignment = TextAlignmentOptions.MidlineLeft;
 			}
-			Object.DontDestroyOnLoad(uiCell);
-		}
-
-		public override void Load(ISettingsSaveLoad loader) {
-			Value = Plugin.Config.PreferredName.Value ?? "";
-		}
-
-		public override void Save(ISettingsSaveLoad saver) {
-			Plugin.Config.DisplayName = Value.Trim();
-		}
-
-		public override void ApplyValue() {}
-
-		public override GameObject GetSettingUICell() {
 			return uiCell;
 		}
 
-		protected override string GetDefaultValue() {
-			return "";
-		}
-
-		public string GetDisplayName() {
-			return "PREFERREDNAMESETTING";
-		}
-
-		public string GetCategory() {
-			return "General";
-		}
-
-		public bool ShouldShow() {
-			return !PhotonNetwork.InRoom;
-		}
-
 		internal static void Initialize(Transform parent) {
+			if(initialized) return;
 			TranslationKey i18n = MenuAPI.CreateLocalization("PREFERREDNAMESETTING")
 				.AddLocalization("Preferred Name", LocalizedText.Language.English)
 				.AddLocalization("Nom préféré", LocalizedText.Language.French)
@@ -90,6 +95,7 @@ namespace CustomizableName.Components {
 				.AddLocalization("Preferowana nazwa", LocalizedText.Language.Polish)
 				.AddLocalization("Tercih edilen isim", LocalizedText.Language.Turkish);
 			SettingsHandler.Instance.AddSetting(new PreferredNameSetting());
+			initialized = true;
 		}
 	}
 }

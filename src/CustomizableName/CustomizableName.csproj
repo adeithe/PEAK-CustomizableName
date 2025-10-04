@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PluginAuthor>Adeithe</PluginAuthor>
-    <PluginVersion>1.0.0</PluginVersion>
+    <PluginVersion>1.1.0</PluginVersion>
     <PluginName>CustomizableName</PluginName>
     <PluginID>Adeithe.Peak.CustomizableName</PluginID>
     

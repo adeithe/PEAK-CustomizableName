@@ -1,8 +1,16 @@
 <Project>
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(CI)' != 'true'">
     <RestoreAdditionalProjectSources>
       https://nuget.bepinex.dev/v3/index.json;
       https://nuget.windows10ce.com/nuget/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(CI)' == 'true'">
+    <RestoreAdditionalProjectSources>
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.windows10ce.com/nuget/v3/index.json;
+      https://nuget.pkg.github.com/adeithe/index.json
     </RestoreAdditionalProjectSources>
   </PropertyGroup>
 
@@ -15,12 +23,17 @@
   </ItemGroup>
 
   <!-- NuGet fallback stripped game references -->
-  <ItemGroup Condition="!Exists('$(ManagedDir)')">
+  <ItemGroup Condition="!Exists('$(ManagedDir)') And '$(CI)' != 'true'">
     <PackageReference Include="UnityEngine.Modules" Version="6000.0.36" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- NuGet game references for CI/CD -->
+  <ItemGroup Condition="!Exists('$(ManagedDir)') And '$(CI)' == 'true'">
+    <PackageReference Include="Adeithe.GameModding.PEAKRef" Version="*" Private="true" PrivateAssets="all" />
+  </ItemGroup>
+
   <!-- Local game references -->
-  <ItemGroup Condition="Exists('$(ManagedDir)')">
+  <ItemGroup Condition="Exists('$(ManagedDir)') And '$(CI)' != 'true'">
     <LocalReferences
       Include="$(ManagedDir)*.dll"
       Exclude="$(ManagedDir)Mono*.dll;$(ManagedDir)netstandard.dll;$(ManagedDir)System*.dll;$(ManagedDir)mscorlib.dll" />
