@@ -30,6 +30,8 @@ jobs:
         run: dotnet nuget add source --username ${{ github.actor }} --password ${{ github.token }} --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --store-password-in-clear-text
       - id: build
         name: Build and publish
+        env:
+          TCLI_AUTH_TOKEN: ${{ secrets.TCLI_AUTH_TOKEN }}
         run: |
           dotnet build -c Release -target:PublishTS
           FILE=$(find ${{ github.workspace }}/artifacts/thunderstore -type f -name "*.zip" | head -n 1)
