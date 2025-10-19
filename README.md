@@ -18,4 +18,4 @@ You can join me on [Discord][discord] if you are running into issues, need help,
 I will try to respond as quickly as possible.
 
 [ko-fi]: https://ko-fi.com/adeithe
-[discord]: https://discord.gg/aRXwDFaMaD
+[discord]: https://discord.gg/TRr8Wbby89
