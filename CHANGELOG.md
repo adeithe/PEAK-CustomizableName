@@ -4,6 +4,11 @@ All notable changes to this project will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## v1.2.0 - November 9th, 2025
+
+### Fixed
+- Resolved a fatal error caused by a change in THE ROOTS update.
+
 ## v1.1.0 - October 4th, 2025
 
 ### Changed

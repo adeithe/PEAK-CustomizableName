@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Peak.Network;
 using Photon.Pun;
 
 namespace CustomizableName.Patches {
@@ -6,11 +7,10 @@ namespace CustomizableName.Patches {
 	internal class NetworkConnectorPatch {
 		[HarmonyPatch("Start"), HarmonyPostfix]
 		public static void Start_Postfix(NetworkConnector __instance) {
-			PhotonNetwork.NickName = NetworkConnector.GetUsername();
+			PhotonNetwork.NickName = NetworkingUtilities.GetUsername();
 		}
 
-
-		[HarmonyPatch("GetUsername"), HarmonyPrefix]
+		[HarmonyPatch(typeof(NetworkingUtilities), "GetUsername"), HarmonyPrefix]
 		public static bool GetUsername_Prefix(ref string __result) {
 			__result = Plugin.Config.DisplayName;
 			return false;
